@@ -26,25 +26,82 @@
 
 #include "word_count.h"
 
+
+/*
+The word count definition for word_count_l.c after preprocessor macros are:
+
+typedef struct word_count {
+  char* word;
+  int count;
+  struct list_elem elem;
+} word_count_t;
+
+using word_count_list_t = struct list;
+
+*/
+
 void init_words(word_count_list_t* wclist) { /* TODO */
+  list_init(wclist);
 }
 
 size_t len_words(word_count_list_t* wclist) {
   /* TODO */
-  return 0;
+
+  struct list_elem *e;
+  int length = 0;
+
+  for(e = list_begin(wclist); e != list_end(wclist); e = list_next(e))
+  {
+    list_entry(e, struct word_count, elem);
+    length++;
+  }
+
+  return length;
 }
 
 word_count_t* find_word(word_count_list_t* wclist, char* word) {
-  /* TODO */
+  struct list_elem *e;
+
+  for(e = list_begin(wclist); e != list_end(wclist); e = list_next(e))
+  {
+    word_count_t* element = list_entry(e, struct word_count, elem);
+    if(strcmp(element->word, word) == 0)
+    {
+      return element;
+    }
+  }
   return NULL;
 }
 
 word_count_t* add_word(word_count_list_t* wclist, char* word) {
-  /* TODO */
-  return NULL;
+  struct list_elem *e;
+
+  for(e = list_begin(wclist); e != list_end(wclist); e = list_next(e))
+  {
+    word_count_t* element = list_entry(e, struct word_count, elem);
+    if(strcmp(element->word, word) == 0)
+    {
+      element->count++;
+      return element;
+    }
+  }
+
+  word_count_t* t = malloc(sizeof(word_count_t));
+  t->count = 1;
+  t->word = word;
+  list_push_front(wclist, &t->elem);
+
+  return t;
 }
 
-void fprint_words(word_count_list_t* wclist, FILE* outfile) { /* TODO */
+void fprint_words(word_count_list_t* wclist, FILE* outfile) { 
+  struct list_elem *e;
+
+  for(e = list_begin(wclist); e != list_end(wclist); e = list_next(e))
+  {
+    word_count_t* element = list_entry(e, struct word_count, elem);
+    fprintf(outfile, "%i\t%s\n", element->count, element->word);
+  }
 }
 
 static bool less_list(const struct list_elem* ewc1, const struct list_elem* ewc2, void* aux) {
